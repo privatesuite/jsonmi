@@ -1,0 +1,10 @@
+{
+	"name": "jsonmi",
+	"main": "src/index.js",
+	"description": "A JSON-based API for MailEE",
+	"dependencies": {
+		"js-sha512": "^0.8.0",
+		"jsonwebtoken": "latest",
+		"request-body": "^1.2.5"
+	}
+}
