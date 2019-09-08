@@ -58,7 +58,7 @@ function validJWT (token) {
 
 		res.setHeader("Access-Control-Allow-Origin", "*");
 		res.setHeader("Access-Control-Allow-Methods", "*");
-		res.setHeader("Access-Control-Allow-Headers", "*");
+		res.setHeader("Access-Control-Allow-Headers", req.headers["access-control-request-headers"] || "*");
 
 		if (req.method.toLowerCase() === "options") {
 
@@ -228,9 +228,11 @@ function validJWT (token) {
 
 		} else if (requestedUrl.pathname === "/update_user") {
 
-			if (me().admin) {
+			const form = await body(req);
 
-				const form = await body(req);
+			console.log(form.username, me().username)
+
+			if (me().admin || form.username === me().username) {
 
 				if (!form || typeof form.username !== "string" || typeof form.changes !== "object") {
 
@@ -240,12 +242,12 @@ function validJWT (token) {
 						
 					});
 
-					res.end({
+					res.end(JSON.stringify({
 
 						error: "invalidBody",
 						message: "Invalid Body"
 
-					});
+					}));
 
 					return;
 
@@ -266,12 +268,12 @@ function validJWT (token) {
 						
 					});
 
-					res.end({
+					res.end(JSON.stringify({
 
 						error: "userNotFound",
 						message: "User Not Found"
 
-					});
+					}));
 
 					return;
 
