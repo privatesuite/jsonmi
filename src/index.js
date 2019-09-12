@@ -260,7 +260,7 @@ function validJWT (token) {
 
 				const user = mailee.smtp.users.findIndex(_ => _.username === form.username);
 
-				if (user === -1) {
+				if (user === -1 && !form.create) {
 
 					res.writeHead(400, {
 
@@ -280,7 +280,8 @@ function validJWT (token) {
 				}
 
 				if (!form.delete) mailee.smtp.users.push({...mailee.smtp.users[user], ...form.changes});
-				if (user) mailee.smtp.users.splice(user, 1);
+				if (user !== -1) mailee.smtp.users.splice(user, 1);
+				
 				// mailee.smtp.users[user] = {...mailee.smtp.users[user], ...form.changes};
 
 				fs.writeFileSync(path.join(mailee.constants.basePath, mailee.smtp.options.userfile), JSON.stringify(mailee.smtp.users.filter(_ => !_.virtual), null, 2));
