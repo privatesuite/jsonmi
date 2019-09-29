@@ -15,7 +15,7 @@ const secret = config.jsonmi.secret || (Math.random().toString(36).replace("0.",
 
 function validJWT (token) {
 
-	console.log(token);
+	// console.log(token);
 
 	try {
 
@@ -135,14 +135,44 @@ function validJWT (token) {
 
 		}
 
-		if (requestedUrl.pathname === "/inbox") {
+		if (requestedUrl.pathname === "/send_email") {
+
+			const form = await body(req);
+
+			mailee.smtp.sendEmail("mailee_root", mailee.smtp.sessionRootPassword, {
+
+				to: form.to,
+				cc: form.cc,
+				bcc: form.bcc,
+				subject: form.subject,
+				from: `${jwt.username}@${config.smtp.host}`,
+
+				text: form.text,
+				html: form.html
+
+			});
+
+			res.writeHead(200, {
+
+				"Content-Type": "application/json"
+				
+			});
+
+			res.end(JSON.stringify({
+
+				success: "operationSuccessful",
+				message: "Operation Successful"
+
+			}));
+
+		} else if (requestedUrl.pathname === "/inbox") {
 
 			const limit = parseInt(query.limit) || 1000;
 
 			log.info(`Looking for emails to "${jwt.username}@${config.smtp.host}"...`);
 
 			// for (const e of (await mailee.database.getEmails())) log.info(e.metadata.to.value.map(_ => _.address));
-			const emails = (await mailee.database.getEmails()).filter(_ => _.metadata.to.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1).slice(0, limit);
+			const emails = (await mailee.database.getEmails()).filter(_ => (_.metadata.to.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1) || (_.metadata.cc ? _.metadata.cc.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1 : false) || (_.metadata.bcc ? _.metadata.bcc.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1 : false)).slice(0, limit);
 
 			res.writeHead(200, {
 
@@ -229,8 +259,6 @@ function validJWT (token) {
 		} else if (requestedUrl.pathname === "/update_user") {
 
 			const form = await body(req);
-
-			console.log(form.username, me().username)
 
 			if (me().admin || form.username === me().username) {
 
