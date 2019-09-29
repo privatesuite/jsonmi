@@ -145,7 +145,7 @@ function validJWT (token) {
 				cc: form.cc,
 				bcc: form.bcc,
 				subject: form.subject,
-				from: me().name ? `${jwt.username}@${config.smtp.host}` : `${me().name} <${jwt.username}@${config.smtp.host}>`,
+				from: !me().name ? `${jwt.username}@${config.smtp.host}` : `${me().name} <${jwt.username}@${config.smtp.host}>`,
 
 				text: form.text,
 				html: form.html
