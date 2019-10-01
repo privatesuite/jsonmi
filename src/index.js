@@ -172,7 +172,7 @@ function validJWT (token) {
 			log.info(`Looking for emails to "${jwt.username}@${config.smtp.host}"...`);
 
 			// for (const e of (await mailee.database.getEmails())) log.info(e.metadata.to.value.map(_ => _.address));
-			const emails = (await mailee.database.getEmails()).filter(_ => (_.metadata.to.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1) || (_.metadata.cc ? _.metadata.cc.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1 : false) || (_.metadata.bcc ? _.metadata.bcc.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1 : false)).slice(0, limit);
+			const emails = (await mailee.database.getEmails()).filter(_ => (_.metadata.to.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1) || (_.metadata.cc ? _.metadata.cc.value.map(_ => _.address).indexOf(`${jwt.username}@${config.smtp.host}`) !== -1 : false) || (_.metadata.bcc ? _.metadata.bcc.indexOf(`${jwt.username}@${config.smtp.host}`) !== -1 : false)).slice(0, limit);
 
 			res.writeHead(200, {
 
